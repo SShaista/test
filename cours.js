@@ -1,3 +1,9 @@
+// cours.js
+
+// =====================
+// Cours (UE/ECUE) - Page cours.html
+// =====================
+
 let selectedSemester = "all";
 
 const ueData = [
@@ -10,11 +16,11 @@ const ueData = [
     title: "UE11 - Homogénéisation en sciences pour l'ingénieur",
     code: "UE11",
     ecues: [
-      { id: "ecue111", name: "Mathématiques appliquées", code: "ECUE111", teacher: "M. Durand", description: "" },
-      { id: "ecue112", name: "Physique et Applications", code: "ECUE112", teacher: "M. Bouaba", description: "" },
-      { id: "ecue113", name: "Modélisation pour la conception (UML)", code: "ECUE113", teacher: "Mme Oubekkou", description: "" },
-      { id: "ecue114", name: "Algorithmique", code: "ECUE114", teacher: "M. Abreu", description: "" },
-      { id: "ecue115", name: "Initiation aux systèmes : Linux & shell", code: "ECUE115", teacher: "M. Diaz", description: "" },
+      { id: "ecue111", name: "Mathématiques appliquées", code: "ECUE111", teacher: "Nom du prof", description: "" },
+      { id: "ecue112", name: "Physique et Applications", code: "ECUE112", teacher: "Nom du prof", description: "" },
+      { id: "ecue113", name: "Modélisation pour la conception (UML)", code: "ECUE113", teacher: "Nom du prof", description: "" },
+      { id: "ecue114", name: "Algorithmique", code: "ECUE114", teacher: "Nom du prof", description: "" },
+      { id: "ecue115", name: "Initiation aux systèmes : Linux & shell", code: "ECUE115", teacher: "Nom du prof", description: "" },
     ],
   },
   {
@@ -23,8 +29,8 @@ const ueData = [
     title: "UE12 - Sciences pour l'ingénieur I",
     code: "UE12",
     ecues: [
-      { id: "ecue121", name: "Physique numérique", code: "ECUE121", teacher: "M. Fried", description: "" },
-      { id: "ecue122", name: "Introduction à la programmation", code: "ECUE122", teacher: "M. Haddad", description: "" },
+      { id: "ecue121", name: "Physique numérique", code: "ECUE121", teacher: "Nom du prof", description: "" },
+      { id: "ecue122", name: "Introduction à la programmation", code: "ECUE122", teacher: "Nom du prof", description: "" },
     ],
   },
   {
@@ -43,10 +49,10 @@ const ueData = [
     title: "UE14 - Technologies I",
     code: "UE14",
     ecues: [
-      { id: "ecue141", name: "Initiation réseau (protocoles et services)", code: "ECUE141", teacher: "M. Diaz", description: "" },
-      { id: "ecue142", name: "Introduction aux réseaux hospitaliers (architectures)", code: "ECUE142", teacher: "M. Hoceini", description: "" },
-      { id: "ecue143", name: "Métrologie, capteurs et signaux physiologiques", code: "ECUE143", teacher: "M. Haddad", description: "" },
-      { id: "ecue144", name: "Méthodes de représentation pour le contrôle / commande", code: "ECUE144", teacher: "Mme Paresys", description: "" },
+      { id: "ecue141", name: "Initiation réseau (protocoles et services)", code: "ECUE141", teacher: "Nom du prof", description: "" },
+      { id: "ecue142", name: "Introduction aux réseaux hospitaliers (architectures)", code: "ECUE142", teacher: "Nom du prof", description: "" },
+      { id: "ecue143", name: "Métrologie, capteurs et signaux physiologiques", code: "ECUE143", teacher: "Nom du prof", description: "" },
+      { id: "ecue144", name: "Méthodes de représentation pour le contrôle / commande", code: "ECUE144", teacher: "Nom du prof", description: "" },
     ],
   },
   {
@@ -55,8 +61,8 @@ const ueData = [
     title: "UE15 - Communication et professionnalisation I",
     code: "UE15",
     ecues: [
-      { id: "ecue151", name: "Anglais : Communication at work / Presenting Scientific contents", code: "ECUE151", teacher: "Mme Camerlynck", description: "" },
-      { id: "ecue152", name: "Dynamique de groupe et communication", code: "ECUE152", teacher: "M. Dartiguepeyrou", description: "" },
+      { id: "ecue151", name: "Anglais : Communication at work / Presenting Scientific contents", code: "ECUE151", teacher: "Nom du prof", description: "" },
+      { id: "ecue152", name: "Dynamique de groupe et communication", code: "ECUE152", teacher: "Nom du prof", description: "" },
       { id: "ecue153", name: "Les entreprises dans leur écosystème", code: "ECUE153", teacher: "Nom du prof", description: "" },
     ],
   },
@@ -66,7 +72,7 @@ const ueData = [
     title: "UE16 - Expérience en entreprise",
     code: "UE16",
     ecues: [
-      { id: "ue161", name: "Rapport semestriel activités en entreprise", code: "UE161", teacher: "M. Mellouk", description: "" },
+      { id: "ue161", name: "Rapport semestriel activités en entreprise", code: "UE161", teacher: "Nom du prof", description: "" },
       { id: "ue162", name: "Rapports alternance entreprise", code: "UE162", teacher: "Nom du prof", description: "" },
     ],
   },
@@ -132,6 +138,53 @@ const ueData = [
   },
 ];
 
+// DOM
+const loadingScreen = document.getElementById("loading-screen");
+const app = document.getElementById("app");
+const currentDateEl = document.getElementById("current-date");
+
+// =====================
+// Init
+// =====================
+document.addEventListener("DOMContentLoaded", () => {
+  // Date du jour
+  const now = new Date();
+  if (currentDateEl) {
+    currentDateEl.textContent = now.toLocaleDateString("fr-FR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
+  }
+
+  // Loading -> app
+  setTimeout(() => {
+    loadingScreen?.classList.add("hidden");
+    app?.classList.remove("hidden");
+  }, 300);
+
+  // Setup filter
+  setupFilterSelector();
+  renderCourses();
+});
+
+// =====================
+// Filtres
+// =====================
+function setupFilterSelector() {
+  const filterButtons = document.querySelectorAll(".filter-btn");
+  if (!filterButtons.length) return;
+
+  filterButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      filterButtons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      selectedSemester = btn.dataset.semester || "all";
+      renderCourses();
+    });
+  });
+}
+
 // =====================
 // Render Cours (sans ECTS)
 // =====================
@@ -194,4 +247,16 @@ function renderCourses() {
       `;
     })
     .join("");
+}
+
+// =====================
+// Helpers
+// =====================
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
