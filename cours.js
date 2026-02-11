@@ -1,109 +1,139 @@
-// =====================
-// Cours (UE/ECUE) - Page cours.html
-// =====================
-
 let selectedSemester = "all";
 
 const ueData = [
+  // =====================
+  // SEMESTRE 1
+  // =====================
   {
-    id: "ue-s1-maths",
+    id: "ue11",
     semester: 1,
-    title: "UE Mathématiques & Modélisation",
-    code: "UE1",
+    title: "UE11 - Homogénéisation en sciences pour l'ingénieur",
+    code: "UE11",
     ecues: [
-      { id: "ecue1", name: "Analyse Numérique", code: "MAT-101", teacher: "Dr. Martin", credits: 3, description: "Méthodes numériques pour la résolution d'équations différentielles et l'optimisation.", color: "#007bff" },
-      { id: "ecue8", name: "Probabilités et Statistiques", code: "MAT-103", teacher: "Dr. Michel", credits: 3, description: "Théorie des probabilités et méthodes statistiques pour l'ingénieur.", color: "#e83e8c" },
+      { id: "ecue111", name: "Mathématiques appliquées", code: "ECUE111", teacher: "M. Durand", description: "" },
+      { id: "ecue112", name: "Physique et Applications", code: "ECUE112", teacher: "M. Bouaba", description: "" },
+      { id: "ecue113", name: "Modélisation pour la conception (UML)", code: "ECUE113", teacher: "Mme Oubekkou", description: "" },
+      { id: "ecue114", name: "Algorithmique", code: "ECUE114", teacher: "M. Abreu", description: "" },
+      { id: "ecue115", name: "Initiation aux systèmes : Linux & shell", code: "ECUE115", teacher: "M. Diaz", description: "" },
     ],
   },
   {
-    id: "ue-s1-meca",
+    id: "ue12",
     semester: 1,
-    title: "UE Mécanique",
-    code: "UE2",
+    title: "UE12 - Sciences pour l'ingénieur I",
+    code: "UE12",
     ecues: [
-      { id: "ecue4", name: "Résistance des Matériaux", code: "MEC-102", teacher: "Dr. Robert", credits: 4, description: "Analyse des contraintes et déformations dans les structures mécaniques.", color: "#ffc107" },
+      { id: "ecue121", name: "Physique numérique", code: "ECUE121", teacher: "M. Fried", description: "" },
+      { id: "ecue122", name: "Introduction à la programmation", code: "ECUE122", teacher: "M. Haddad", description: "" },
     ],
   },
   {
-    id: "ue-s2-phys",
+    id: "ue13",
+    semester: 1,
+    title: "UE13 - Ouverture Scientifique Pluridisciplinaire I",
+    code: "UE13",
+    ecues: [
+      { id: "ecue131", name: "Le monde de la santé et sa sémantique", code: "ECUE131", teacher: "Nom du prof", description: "" },
+      { id: "ecue132", name: "Histoire des sciences et de l'industrie", code: "ECUE132", teacher: "Nom du prof", description: "" },
+    ],
+  },
+  {
+    id: "ue14",
+    semester: 1,
+    title: "UE14 - Technologies I",
+    code: "UE14",
+    ecues: [
+      { id: "ecue141", name: "Initiation réseau (protocoles et services)", code: "ECUE141", teacher: "M. Diaz", description: "" },
+      { id: "ecue142", name: "Introduction aux réseaux hospitaliers (architectures)", code: "ECUE142", teacher: "M. Hoceini", description: "" },
+      { id: "ecue143", name: "Métrologie, capteurs et signaux physiologiques", code: "ECUE143", teacher: "M. Haddad", description: "" },
+      { id: "ecue144", name: "Méthodes de représentation pour le contrôle / commande", code: "ECUE144", teacher: "Mme Paresys", description: "" },
+    ],
+  },
+  {
+    id: "ue15",
+    semester: 1,
+    title: "UE15 - Communication et professionnalisation I",
+    code: "UE15",
+    ecues: [
+      { id: "ecue151", name: "Anglais : Communication at work / Presenting Scientific contents", code: "ECUE151", teacher: "Mme Camerlynck", description: "" },
+      { id: "ecue152", name: "Dynamique de groupe et communication", code: "ECUE152", teacher: "M. Dartiguepeyrou", description: "" },
+      { id: "ecue153", name: "Les entreprises dans leur écosystème", code: "ECUE153", teacher: "Nom du prof", description: "" },
+    ],
+  },
+  {
+    id: "ue16",
+    semester: 1,
+    title: "UE16 - Expérience en entreprise",
+    code: "UE16",
+    ecues: [
+      { id: "ue161", name: "Rapport semestriel activités en entreprise", code: "UE161", teacher: "M. Mellouk", description: "" },
+      { id: "ue162", name: "Rapports alternance entreprise", code: "UE162", teacher: "Nom du prof", description: "" },
+    ],
+  },
+
+  // =====================
+  // SEMESTRE 2
+  // =====================
+  {
+    id: "ue21",
     semester: 2,
-    title: "UE Physique & Thermodynamique",
-    code: "UE3",
+    title: "UE21 - Sciences pour l'ingénieur II",
+    code: "UE21",
     ecues: [
-      { id: "ecue2", name: "Mécanique des Fluides", code: "PHY-201", teacher: "Dr. Bernard", credits: 4, description: "Étude des fluides en mouvement, équations de Navier-Stokes et applications.", color: "#17a2b8" },
-      { id: "ecue5", name: "Thermodynamique Appliquée", code: "PHY-202", teacher: "Dr. Richard", credits: 3, description: "Principes thermodynamiques et applications en ingénierie.", color: "#dc3545" },
+      { id: "ecue211", name: "Mathématiques pour l'ingénieur", code: "ECUE211", teacher: "Nom du prof", description: "" },
+      { id: "ecue212", name: "Acquisition, Traitement et Modélisation statistique des données physiologiques", code: "ECUE212", teacher: "Nom du prof", description: "" },
     ],
   },
   {
-    id: "ue-s2-elec",
+    id: "ue22",
     semester: 2,
-    title: "UE Électronique",
-    code: "UE4",
+    title: "UE22 - Ouverture Scientifique Pluridisciplinaire II",
+    code: "UE22",
     ecues: [
-      { id: "ecue7", name: "Circuits Électroniques", code: "ELE-201", teacher: "Dr. Laurent", credits: 4, description: "Conception et analyse de circuits électroniques analogiques et numériques.", color: "#fd7e14" },
+      { id: "ecue221", name: "Approche biosociologique du monde de la santé", code: "ECUE221", teacher: "Nom du prof", description: "" },
+      { id: "ecue222", name: "Philosophie des sciences : Imaginaire et société / Sociologie de la Technologie", code: "ECUE222", teacher: "Nom du prof", description: "" },
     ],
   },
   {
-    id: "ue-s3-info",
-    semester: 3,
-    title: "UE Informatique & Dev",
-    code: "UE5",
+    id: "ue23",
+    semester: 2,
+    title: "UE23 - Technologies II",
+    code: "UE23",
     ecues: [
-      { id: "ecue3", name: "Programmation Orientée Objet", code: "INFO-301", teacher: "Dr. Petit", credits: 5, description: "Concepts avancés de POO, design patterns, développement d'applications.", color: "#28a745" },
-      { id: "ecue6", name: "Développement Web Full Stack", code: "INFO-302", teacher: "Dr. Simon", credits: 6, description: "Apps web modernes (front/back) et bases de données.", color: "#6f42c1" },
+      { id: "ecue231", name: "Administration des services et systèmes", code: "ECUE231", teacher: "Nom du prof", description: "" },
+      { id: "ecue232", name: "Interconnexion et réseaux d'accès", code: "ECUE232", teacher: "Nom du prof", description: "" },
+      { id: "ecue233", name: "Initiation aux technologies réseaux sans fil pour la santé", code: "ECUE233", teacher: "Nom du prof", description: "" },
+      { id: "ecue234", name: "Introduction à la programmation objet", code: "ECUE234", teacher: "Nom du prof", description: "" },
+      { id: "ecue235", name: "Conception des interfaces homme-machine pour les systèmes d'aide", code: "ECUE235", teacher: "Nom du prof", description: "" },
+      { id: "ecue236", name: "Introduction aux bases de données pour la santé, SQL", code: "ECUE236", teacher: "Nom du prof", description: "" },
+    ],
+  },
+  {
+    id: "ue24",
+    semester: 2,
+    title: "UE24 - Communication et professionnalisation II",
+    code: "UE24",
+    ecues: [
+      { id: "ecue241", name: "Anglais : Science and Healthcare / relationships and company organisation", code: "ECUE241", teacher: "Nom du prof", description: "" },
+      { id: "ecue242", name: "Le risque sociétal dans le métier de l'ingénieur", code: "ECUE242", teacher: "Nom du prof", description: "" },
+      { id: "ecue243", name: "Conduite et Optimisation", code: "ECUE243", teacher: "Nom du prof", description: "" },
+      { id: "ecue244", name: "Méthodologie scientifique & Innovations (1)", code: "ECUE244", teacher: "Nom du prof", description: "" },
+    ],
+  },
+  {
+    id: "ue25",
+    semester: 2,
+    title: "UE25 - Expérience en entreprise",
+    code: "UE25",
+    ecues: [
+      { id: "ue251", name: "Rapport semestriel activités en entreprise", code: "UE251", teacher: "Nom du prof", description: "" },
+      { id: "ue252", name: "Rapports alternances entreprise", code: "UE252", teacher: "Nom du prof", description: "" },
     ],
   },
 ];
 
-// DOM
-const loadingScreen = document.getElementById("loading-screen");
-const app = document.getElementById("app");
-const currentDateEl = document.getElementById("current-date");
-
 // =====================
-// Init
-// =====================
-document.addEventListener("DOMContentLoaded", () => {
-  // Date du jour
-  const now = new Date();
-  if (currentDateEl) {
-    currentDateEl.textContent = now.toLocaleDateString("fr-FR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-    });
-  }
-
-  // Loading -> app
-  setTimeout(() => {
-    loadingScreen?.classList.add("hidden");
-    app?.classList.remove("hidden");
-  }, 300);
-
-  // Setup filter
-  setupFilterSelector();
-  renderCourses();
-});
-
-// =====================
-// Filtres
-// =====================
-function setupFilterSelector() {
-  const filterButtons = document.querySelectorAll(".filter-btn");
-  if (!filterButtons.length) return;
-
-  filterButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      filterButtons.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      selectedSemester = btn.dataset.semester || "all";
-      renderCourses();
-    });
-  });
-}
-
-// =====================
-// Render Cours
+// Render Cours (sans ECTS)
 // =====================
 function renderCourses() {
   const container = document.getElementById("courses-list");
@@ -118,17 +148,11 @@ function renderCourses() {
 
   const totalUE = filteredUEs.length;
   const totalECUE = filteredUEs.reduce((acc, ue) => acc + ue.ecues.length, 0);
-  const totalECTS = filteredUEs.reduce(
-    (acc, ue) => acc + ue.ecues.reduce((a, e) => a + (e.credits || 0), 0),
-    0
-  );
 
   const cEl = document.getElementById("coursesCount");
   const uEl = document.getElementById("uesCount");
-  const eEl = document.getElementById("ectsTotal");
   if (cEl) cEl.textContent = String(totalECUE);
   if (uEl) uEl.textContent = String(totalUE);
-  if (eEl) eEl.textContent = String(totalECTS);
 
   if (!filteredUEs.length) {
     container.innerHTML = `
@@ -142,7 +166,6 @@ function renderCourses() {
 
   container.innerHTML = filteredUEs
     .map((ue) => {
-      const ects = ue.ecues.reduce((a, e) => a + (e.credits || 0), 0);
       return `
         <div class="ue-card">
           <div class="ue-header">
@@ -150,7 +173,6 @@ function renderCourses() {
               <div class="ue-code">${escapeHtml(ue.code || "")}</div>
               <h3 class="ue-title">${escapeHtml(ue.title)}</h3>
             </div>
-            <div class="ue-ects">${ects} ECTS</div>
           </div>
 
           <div class="ue-content">
@@ -158,7 +180,7 @@ function renderCourses() {
               .map(
                 (ecue) => `
               <div class="ecue-item">
-                <div class="ecue-name"><strong>${escapeHtml(ecue.name)}</strong> — ${ecue.credits || 0} ECTS</div>
+                <div class="ecue-name"><strong>${escapeHtml(ecue.name)}</strong></div>
                 <div class="ecue-meta">
                   ${escapeHtml(ecue.code || "")}${ecue.teacher ? " • " + escapeHtml(ecue.teacher) : ""}
                 </div>
@@ -172,16 +194,4 @@ function renderCourses() {
       `;
     })
     .join("");
-}
-
-// =====================
-// Helpers
-// =====================
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }
