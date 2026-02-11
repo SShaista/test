@@ -1,205 +1,330 @@
-const ueData = window.ueData || [];
+// =====================
+// Examens & Tâches - Page examens.html
+// =====================
 
-const EXAMS_KEY = "portal.exams";
-const TASKS_KEY = "portal.tasks";
+const EXAMS_KEY = "studentPortal.exams.v2";
+const TASKS_KEY = "studentPortal.tasks.v2";
 
-let examsData = JSON.parse(localStorage.getItem(EXAMS_KEY) || "[]");
-let tasksData = JSON.parse(localStorage.getItem(TASKS_KEY) || "[]");
+let examsData = loadJson(EXAMS_KEY, []);
+let tasksData = loadJson(TASKS_KEY, []);
+
+// DOM
+const loadingScreen = document.getElementById("loading-screen");
+const app = document.getElementById("app");
+const currentDateEl = document.getElementById("current-date");
 
 document.addEventListener("DOMContentLoaded", () => {
-
   const now = new Date();
-  document.getElementById("current-date").textContent =
-    now.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+  if (currentDateEl) {
+    currentDateEl.textContent = now.toLocaleDateString("fr-FR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
+  }
 
-  setTimeout(()=>{
-    document.getElementById("loading-screen").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-  },300);
+  setTimeout(() => {
+    loadingScreen?.classList.add("hidden");
+    app?.classList.remove("hidden");
+  }, 300);
 
-  populateCourses();
+  setupExamForm();
+  setupTaskInput();
+
   renderExams();
   renderTasks();
-
-  document.getElementById("addExamBtn").addEventListener("click", addExam);
-  document.getElementById("add-task-btn").addEventListener("click", addTask);
 });
 
-/* ===================== COURSES ===================== */
-
-function populateCourses(){
-  const names = new Set();
-
-  for(const ue of ueData){
-    for(const ecue of ue.ecues || []){
-      if(ecue.name) names.add(ecue.name);
-    }
-  }
-
-  const sorted = Array.from(names).sort((a,b)=>a.localeCompare(b,"fr"));
-
-  const examSelect = document.getElementById("examCourse");
-  const taskSelect = document.getElementById("task-course");
-
-  examSelect.innerHTML = `<option value="">Choisir un cours…</option>` +
-    sorted.map(n=>`<option>${n}</option>`).join("");
-
-  taskSelect.innerHTML =
-    `<option value="Général">Général</option>` +
-    sorted.map(n=>`<option>${n}</option>`).join("");
+// =====================
+// Examens
+// =====================
+function setupExamForm() {
+  const addBtn = document.getElementById("addExamBtn");
+  addBtn?.addEventListener("click", addExam);
 }
 
-/* ===================== EXAMS ===================== */
+function addExam() {
+  const type = document.getElementById("examType")?.value || "Examen";
+  const courseName = document.getElementById("examCourse")?.value?.trim();
+  const date = document.getElementById("examDate")?.value;
+  const time = document.getElementById("examTime")?.value || "09:00";
+  const room = document.getElementById("examRoom")?.value?.trim() || "";
 
-function addExam(){
-  const course = document.getElementById("examCourse").value;
-  const type = document.getElementById("examType").value;
-  const date = document.getElementById("examDate").value;
-  const time = document.getElementById("examTime").value;
-  const room = document.getElementById("examRoom").value;
+  if (!courseName) {
+    alert("Entre le nom du cours.");
+    return;
+  }
+  if (!date) {
+    alert("Choisis une date.");
+    return;
+  }
 
-  if(!course || !date) return;
-
-  examsData.unshift({
-    id: Date.now(),
-    course,
+  const newExam = {
+    id: "exam_" + Date.now(),
     type,
+    courseName,
     date,
     time,
-    room
-  });
+    room,
+  };
 
-  localStorage.setItem(EXAMS_KEY, JSON.stringify(examsData));
+  examsData.unshift(newExam);
+  saveJson(EXAMS_KEY, examsData);
+
+  // reset light
+  const c = document.getElementById("examCourse");
+  const r = document.getElementById("examRoom");
+  if (c) c.value = "";
+  if (r) r.value = "";
+
   renderExams();
 }
 
-function deleteExam(id){
-  examsData = examsData.filter(e=>e.id!==id);
-  localStorage.setItem(EXAMS_KEY, JSON.stringify(examsData));
+function deleteExam(examId) {
+  examsData = examsData.filter((e) => e.id !== examId);
+  saveJson(EXAMS_KEY, examsData);
   renderExams();
 }
-
-function renderExams(){
-  const container = document.getElementById("exams-list");
-
-  if(!examsData.length){
-    container.innerHTML = `<div class="empty-state">Aucun examen.</div>`;
-    return;
-  }
-
-  container.innerHTML = examsData.map(e=>`
-    <div class="schedule-card">
-      <div style="display:flex;justify-content:space-between;">
-        <span class="badge ${badgeClass(e.type)}">${e.type}</span>
-        <button onclick="deleteExam(${e.id})">🗑️</button>
-      </div>
-      <h3>${e.course}</h3>
-      <div class="meta-row">
-        <span>📅 ${e.date}</span>
-        <span>🕒 ${e.time}</span>
-        ${e.room ? `<span>📍 ${e.room}</span>` : ""}
-      </div>
-    </div>
-  `).join("");
-}
-
-function badgeClass(type){
-  if(type==="Examen") return "badge--exam";
-  if(type==="Contrôle") return "badge--controle";
-  return "badge--devoir";
-}
-
 window.deleteExam = deleteExam;
 
-/* ===================== TASKS ===================== */
+function renderExams() {
+  const container = document.getElementById("exams-list");
+  if (!container) return;
 
-function addTask(){
-  const title = document.getElementById("new-task-input").value.trim();
-  const course = document.getElementById("task-course").value;
-  const priority = document.getElementById("task-priority").value;
-
-  if(!title) return;
-
-  tasksData.unshift({
-    id: Date.now(),
-    title,
-    course,
-    priority,
-    completed:false
+  const sorted = [...examsData].sort((a, b) => {
+    const da = new Date(`${a.date}T${a.time || "00:00"}`);
+    const db = new Date(`${b.date}T${b.time || "00:00"}`);
+    return da - db;
   });
 
-  localStorage.setItem(TASKS_KEY, JSON.stringify(tasksData));
-  document.getElementById("new-task-input").value="";
-  renderTasks();
-}
-
-function toggleTask(id){
-  const t = tasksData.find(x=>x.id===id);
-  if(t) t.completed=!t.completed;
-  localStorage.setItem(TASKS_KEY, JSON.stringify(tasksData));
-  renderTasks();
-}
-
-function deleteTask(id){
-  tasksData = tasksData.filter(t=>t.id!==id);
-  localStorage.setItem(TASKS_KEY, JSON.stringify(tasksData));
-  renderTasks();
-}
-
-function renderTasks(){
-  const container = document.getElementById("tasks-list");
-
-  if(!tasksData.length){
-    container.innerHTML = `<div class="empty-state">Aucune tâche.</div>`;
+  if (!sorted.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📅</div>
+        <p>Aucun examen.</p>
+      </div>
+    `;
     return;
   }
 
-  container.innerHTML = tasksData.map(t=>`
-    <div class="task-item ${t.completed?"completed":""}" 
-      style="display:flex;align-items:center;gap:12px;padding:12px;background:white;border-radius:var(--radius);margin-bottom:8px;">
-      
-      <div onclick="toggleTask(${t.id})"
-        style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);
-        display:flex;align-items:center;justify-content:center;cursor:pointer;
-        background:${t.completed?"var(--success)":"transparent"};color:white;">
-        ${t.completed?"✓":""}
-      </div>
+  container.innerHTML = sorted
+    .map((exam) => {
+      const countdown = formatCountdown(exam.date);
 
-      <div style="flex:1;">
-        <p style="${t.completed?"text-decoration:line-through;color:var(--text-muted);":""}">
-          ${t.title}
-        </p>
-        <small>${t.course}</small>
-      </div>
+      return `
+        <div class="schedule-card">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+            <span class="time-badge" style="background:${getTypeColor(exam.type)};font-size:11px;">
+              ${escapeHtml(exam.type)}
+            </span>
+            <span style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
+              ⏳ ${escapeHtml(countdown)}
+            </span>
+          </div>
 
-      <span class="priority-pill ${priorityClass(t.priority)}">
-        ${priorityLabel(t.priority)}
-      </span>
+          <h3 style="font-size:15px;font-weight:600;margin-bottom:10px;">
+            ${escapeHtml(exam.courseName)}
+          </h3>
 
-      <button onclick="deleteTask(${t.id})">🗑️</button>
-    </div>
-  `).join("");
+          <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--text-muted);">
+            <span style="display:flex;align-items:center;gap:6px;">📅 ${escapeHtml(formatDate(exam.date))}</span>
+            <span style="display:flex;align-items:center;gap:6px;">🕒 ${escapeHtml(exam.time)}</span>
+            ${exam.room ? `<span style="display:flex;align-items:center;gap:6px;">📍 ${escapeHtml(exam.room)}</span>` : ""}
+          </div>
 
-  updateSummary();
+          <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+            <button class="icon-btn" title="Supprimer"
+              style="width:auto;height:auto;padding:8px 10px;border-radius:10px;border:1px solid var(--border);"
+              onclick="deleteExam('${escapeHtmlAttr(exam.id)}')">
+              🗑️
+            </button>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
 }
 
-function priorityClass(p){
-  if(p==="high") return "priority-pill--high";
-  if(p==="low") return "priority-pill--low";
-  return "priority-pill--medium";
+function getTypeColor(type) {
+  switch (type) {
+    case "Examen": return "var(--danger)";
+    case "Contrôle": return "var(--warning)";
+    case "Devoir": return "var(--primary)";
+    default: return "var(--text-muted)";
+  }
 }
 
-function priorityLabel(p){
-  if(p==="high") return "Haute";
-  if(p==="low") return "Basse";
-  return "Moyenne";
+// =====================
+// Tâches (titre + priorité uniquement)
+// =====================
+function setupTaskInput() {
+  const input = document.getElementById("new-task-input");
+  const btn = document.getElementById("add-task-btn");
+  if (!btn || !input) return;
+
+  btn.addEventListener("click", addTask);
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") addTask();
+  });
 }
 
-function updateSummary(){
-  const done = tasksData.filter(t=>t.completed).length;
-  document.getElementById("task-count").textContent =
-    `${done} / ${tasksData.length} complétées`;
+function addTask() {
+  const input = document.getElementById("new-task-input");
+  const prio = document.getElementById("task-priority")?.value || "medium";
+
+  const title = input?.value?.trim();
+  if (!title) return;
+
+  const newTask = {
+    id: "task_" + Date.now(),
+    title,
+    dueDate: new Date().toISOString().split("T")[0],
+    completed: false,
+    priority: prio,
+  };
+
+  tasksData.unshift(newTask);
+  saveJson(TASKS_KEY, tasksData);
+
+  if (input) input.value = "";
+  renderTasks();
+}
+
+function toggleTask(taskId) {
+  const task = tasksData.find((t) => t.id === taskId);
+  if (!task) return;
+  task.completed = !task.completed;
+  saveJson(TASKS_KEY, tasksData);
+  renderTasks();
+}
+
+function deleteTask(taskId) {
+  tasksData = tasksData.filter((t) => t.id !== taskId);
+  saveJson(TASKS_KEY, tasksData);
+  renderTasks();
 }
 
 window.toggleTask = toggleTask;
 window.deleteTask = deleteTask;
+
+function renderTasks() {
+  const container = document.getElementById("tasks-list");
+  if (!container) return;
+
+  if (!tasksData.length) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding:24px;">
+        <div class="empty-icon">✓</div>
+        <p>Aucune tâche.</p>
+      </div>
+    `;
+    updateTaskSummary();
+    return;
+  }
+
+  container.innerHTML = tasksData
+    .map((task) => {
+      return `
+        <div class="task-item ${task.completed ? "completed" : ""}"
+          style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:white;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:8px;">
+          
+          <div onclick="toggleTask('${escapeHtmlAttr(task.id)}')"
+            style="width:22px;height:22px;border:2px solid ${task.completed ? "var(--success)" : "var(--border)"};border-radius:50%;
+              display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;
+              background:${task.completed ? "var(--success)" : "transparent"};color:white;">
+            ${task.completed ? "✓" : ""}
+          </div>
+
+          <div style="flex:1;min-width:0;">
+            <p style="font-size:14px;font-weight:500;${task.completed ? "text-decoration:line-through;color:var(--text-muted);" : ""}">
+              ${escapeHtml(task.title)}
+            </p>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);margin-top:2px;">
+              <span>${escapeHtml(formatCountdown(task.dueDate))}</span>
+            </div>
+          </div>
+
+          <span style="font-size:10px;font-weight:600;padding:4px 10px;border-radius:999px;${priorityStyle(task.priority)}">
+            ${priorityLabel(task.priority)}
+          </span>
+
+          <button onclick="deleteTask('${escapeHtmlAttr(task.id)}')"
+            style="padding:6px;color:var(--text-muted);border-radius:6px;">
+            🗑️
+          </button>
+        </div>
+      `;
+    })
+    .join("");
+
+  updateTaskSummary();
+}
+
+function priorityLabel(p) {
+  if (p === "high") return "Haute";
+  if (p === "low") return "Basse";
+  return "Moyenne";
+}
+
+function priorityStyle(p) {
+  if (p === "high") return "background:rgba(220,53,69,.12);color:var(--danger);";
+  if (p === "low") return "background:rgba(40,167,69,.12);color:var(--success);";
+  return "background:rgba(255,193,7,.15);color:#b8860b;";
+}
+
+function updateTaskSummary() {
+  const completed = tasksData.filter((t) => t.completed).length;
+  const total = tasksData.length;
+  const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  const countEl = document.getElementById("task-count");
+  const percentEl = document.getElementById("task-percent");
+  if (countEl) countEl.textContent = `${completed} / ${total} complétées`;
+  if (percentEl) percentEl.textContent = `${percent}% terminé`;
+}
+
+// =====================
+// Utils
+// =====================
+function formatCountdown(dateStr) {
+  const date = new Date(dateStr);
+  const today = new Date();
+  const diffTime = date.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return "Aujourd'hui";
+  if (diffDays === 1) return "Demain";
+  if (diffDays > 0 && diffDays <= 7) return `Dans ${diffDays} jours`;
+  return formatDate(dateStr);
+}
+
+function formatDate(dateStr) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function escapeHtmlAttr(str) {
+  return escapeHtml(str).replaceAll("`", "&#096;");
+}
+
+function loadJson(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveJson(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
