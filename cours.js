@@ -6,7 +6,7 @@
 
 let selectedSemester = "all";
 
-const ueData = [
+const ueData = window.ueData || [
   // =====================
   // SEMESTRE 1
   // =====================
