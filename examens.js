@@ -2,8 +2,10 @@
 // Examens & Tâches - Page examens.html
 // =====================
 
-const EXAMS_KEY = "studentPortal.exams.v2";
-const TASKS_KEY = "studentPortal.tasks.v2";
+const ueData = window.ueData || [];
+
+const EXAMS_KEY = "studentPortal.exams.v3";
+const TASKS_KEY = "studentPortal.tasks.v3";
 
 let examsData = loadJson(EXAMS_KEY, []);
 let tasksData = loadJson(TASKS_KEY, []);
@@ -14,6 +16,7 @@ const app = document.getElementById("app");
 const currentDateEl = document.getElementById("current-date");
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Date du jour
   const now = new Date();
   if (currentDateEl) {
     currentDateEl.textContent = now.toLocaleDateString("fr-FR", {
@@ -23,10 +26,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Loading -> app
   setTimeout(() => {
     loadingScreen?.classList.add("hidden");
     app?.classList.remove("hidden");
   }, 300);
+
+  populateExamCourses();
 
   setupExamForm();
   setupTaskInput();
@@ -34,6 +40,27 @@ document.addEventListener("DOMContentLoaded", () => {
   renderExams();
   renderTasks();
 });
+
+// =====================
+// Remplir le select des cours (depuis courses-data.js)
+// =====================
+function populateExamCourses() {
+  const select = document.getElementById("examCourse");
+  if (!select) return;
+
+  const names = new Set();
+  for (const ue of ueData) {
+    for (const ecue of (ue.ecues || [])) {
+      if (ecue?.name) names.add(ecue.name);
+    }
+  }
+
+  const sorted = Array.from(names).sort((a, b) => a.localeCompare(b, "fr"));
+
+  select.innerHTML =
+    `<option value="">Choisir un cours…</option>` +
+    sorted.map((n) => `<option value="${escapeHtmlAttr(n)}">${escapeHtml(n)}</option>`).join("");
+}
 
 // =====================
 // Examens
@@ -51,7 +78,7 @@ function addExam() {
   const room = document.getElementById("examRoom")?.value?.trim() || "";
 
   if (!courseName) {
-    alert("Entre le nom du cours.");
+    alert("Choisis un cours.");
     return;
   }
   if (!date) {
@@ -72,9 +99,7 @@ function addExam() {
   saveJson(EXAMS_KEY, examsData);
 
   // reset light
-  const c = document.getElementById("examCourse");
   const r = document.getElementById("examRoom");
-  if (c) c.value = "";
   if (r) r.value = "";
 
   renderExams();
