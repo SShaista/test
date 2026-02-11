@@ -385,7 +385,8 @@ function escapeHtml(str) {
 }
 function setStatus(msg, isError = false) {
   if (!icsStatus) return;
-  icsStatus.textContent = msg;
-  icsStatus.style.display = "block";
-  icsStatus.className = isError ? "error" : "";
+  icsStatus.textContent = "";
+  icsStatus.style.display = "none";
+  icsStatus.className = "";
 }
+
