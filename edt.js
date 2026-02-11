@@ -384,9 +384,5 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 function setStatus(msg, isError = false) {
-  if (!icsStatus) return;
-  icsStatus.textContent = "";
-  icsStatus.style.display = "none";
-  icsStatus.className = "";
+  return;  
 }
-
